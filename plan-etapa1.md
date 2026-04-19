@@ -42,11 +42,11 @@ Commit mínimo: 1 commit.
 ### Etapa 2 - Data e inyección
 Commit mínimo: 1 commit.
 
-- [ ] Crear `MoviesRepositoryImpl.kt` en `data/`.
-- [ ] Inyectar la fuente externa en `MoviesRepositoryImpl`.
-- [ ] Hacer el mapeo de DTO a entidad dentro de `data`.
-- [ ] Mover `MoviesDependencyInjector.kt` a `di/`.
-- [ ] Actualizar `MoviesViewModel.kt` para consumir casos de uso y dejar de ordenar o mapear.
+- [x] Crear `MoviesRepositoryImpl.kt` en `data/`.
+- [x] Inyectar la fuente externa en `MoviesRepositoryImpl`.
+- [x] Hacer el mapeo de DTO a entidad dentro de `data`.
+- [x] Mover `MoviesDependencyInjector.kt` a `di/`.
+- [x] Actualizar `MoviesViewModel.kt` para consumir casos de uso y dejar de ordenar o mapear.
 
 ### Etapa 3 - Presentation y cierre
 Commit mínimo: 1 commit.

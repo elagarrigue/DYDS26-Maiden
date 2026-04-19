@@ -2,6 +2,9 @@
 
 package edu.dyds.movies
 
+import edu.dyds.movies.domain.entity.Movie
+import edu.dyds.movies.domain.entity.QualifiedMovie
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells

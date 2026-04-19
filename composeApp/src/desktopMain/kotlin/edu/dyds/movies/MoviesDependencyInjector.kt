@@ -34,6 +34,7 @@ object MoviesDependencyInjector {
 
     @Composable
     fun getMoviesViewModel(): MoviesViewModel {
-        return viewModel { MoviesViewModel(tmdbHttpClient) }
+        // Delegate to the DI implementation under the `di` package to keep a single source of truth.
+        return edu.dyds.movies.di.MoviesDependencyInjector.getMoviesViewModel()
     }
 }

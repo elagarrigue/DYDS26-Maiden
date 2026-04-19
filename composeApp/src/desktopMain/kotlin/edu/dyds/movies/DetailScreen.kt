@@ -2,6 +2,8 @@
 
 package edu.dyds.movies
 
+import edu.dyds.movies.domain.entity.Movie
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
