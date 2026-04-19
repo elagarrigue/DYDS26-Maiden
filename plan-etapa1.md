@@ -32,12 +32,12 @@ Separar el proyecto en capas claras para que cada una tenga una sola responsabil
 ### Etapa 1 - Dominio y contratos
 Commit mínimo: 1 commit.
 
-- [ ] Crear el esqueleto de carpetas con `domain`, `data`, `presentation` y `di`.
-- [ ] Trasladar `Movie.kt` a `domain/entity/`.
-- [ ] Crear `MoviesRepository.kt` en `domain/repository/`.
-- [ ] Crear `GetPopularMoviesUseCase.kt` y `GetMovieDetailsUseCase.kt` en `domain/usecase/`.
-- [ ] Trasladar `RemoteMovie` y `RemoteResult` a `data/external/`.
-- [ ] Mover la ordenación por voto y la transformación a `QualifiedMovie` dentro del caso de uso.
+- [x] Crear el esqueleto de carpetas con `domain`, `data`, `presentation` y `di`.
+- [x] Trasladar `Movie.kt` a `domain/entity/`.
+- [x] Crear `MoviesRepository.kt` en `domain/repository/`.
+- [x] Crear `GetPopularMoviesUseCase.kt` y `GetMovieDetailsUseCase.kt` en `domain/usecase/`.
+- [x] Trasladar `RemoteMovie` y `RemoteResult` a `data/external/`.
+- [x] Mover la ordenación por voto y la transformación a `QualifiedMovie` dentro del caso de uso.
 
 ### Etapa 2 - Data e inyección
 Commit mínimo: 1 commit.
