@@ -1,6 +1,7 @@
 # Plan etapa 1
 
 ## Objetivo
+Modificar la estructura del proyecto para que corresponda a la arquitectura propuesta (siempre respetando los principios SOLID y clean code).
 Separar el proyecto en capas claras para que cada una tenga una sola responsabilidad y dependencias en una sola dirección.
 
 ## Estructura objetivo
@@ -8,47 +9,60 @@ Separar el proyecto en capas claras para que cada una tenga una sola responsabil
 - Presentation
   - Lógica de interfaz.
   - Solo depende de domain.
-  - Un paquete por pantalla: home y detail.
-  - Un paquete utils para componentes reutilizables.
+  - Raíz para App.kt, Navigation.kt y MoviesViewModel.kt.
+  - Paquetes por pantalla: home y detail.
+  - Paquete utils para componentes reutilizables.
 - Domain
-  - Entidades.
-  - Casos de uso.
-  - Interfaces de repositorio.
-  - Regla de negocio: ordenar películas por voto y mapear el resultado a QualifiedMovie.
+  - Entidades en domain/entity.
+  - Casos de uso en domain/usecase.
+  - Interfaces de repositorio en domain/repository.
+  - Regla de negocio: ordenar películas por voto y mapear el resultado a QualifiedMovie dentro del caso de uso.
 - Data
   - Fuente de datos local o externa.
+  - DTOs en data/external.
   - Implementación del repositorio definido en domain.
-  - DTOs y mapeos hacia domain.
+  - Mapeos de DTO a entidad dentro de data.
 - DI
   - Ensamblado de dependencias.
   - Creación de cliente HTTP, repositorios, casos de uso y ViewModels.
+  - Único punto con implementaciones concretas de las capas.
 
-## Orden de migración
+## Etapas
 
-1. Crear la nueva estructura de paquetes o módulos.
-2. Mover Movie y QualifiedMovie a domain.
-3. Definir el contrato del repositorio en domain.
-4. Extraer la lógica de ordenar y clasificar películas a un caso de uso en domain.
-5. Mover RemoteMovie y RemoteResult a data.
-6. Implementar el repositorio en data usando la fuente TMDB.
-7. Dejar la conversión de DTO a entidad dentro de data.
-8. Separar la presentación por pantalla.
-9. Mover CommonComposables a presentation.utils.
-10. Dividir MoviesViewModel en ViewModels por pantalla o por flujo de UI.
-11. Centralizar el armado de objetos en DI.
-12. Ajustar navegación y punto de entrada para usar la nueva composición.
+### Etapa 1 - Dominio y contratos
+Commit mínimo: 1 commit.
 
-## Mapeo de archivos actuales
+- [ ] Crear el esqueleto de carpetas con `domain`, `data`, `presentation` y `di`.
+- [ ] Trasladar `Movie.kt` a `domain/entity/`.
+- [ ] Crear `MoviesRepository.kt` en `domain/repository/`.
+- [ ] Crear `GetPopularMoviesUseCase.kt` y `GetMovieDetailsUseCase.kt` en `domain/usecase/`.
+- [ ] Trasladar `RemoteMovie` y `RemoteResult` a `data/external/`.
+- [ ] Mover la ordenación por voto y la transformación a `QualifiedMovie` dentro del caso de uso.
 
-- CommonComposables.kt -> presentation.utils
-- HomeScreen.kt -> presentation.home
-- DetailScreen.kt -> presentation.detail
-- MoviesViewModel.kt -> presentation.home y presentation.detail, o una coordinación mínima en presentation
-- Movie.kt -> domain.model
-- RemoteMovie y RemoteResult -> data.remote
-- MoviesDependencyInjector.kt -> di
-- Navigation.kt -> presentation.navigation o presentation
-- main.kt -> entrada de desktop sin lógica de negocio
+### Etapa 2 - Data e inyección
+Commit mínimo: 1 commit.
+
+- [ ] Crear `MoviesRepositoryImpl.kt` en `data/`.
+- [ ] Inyectar la fuente externa en `MoviesRepositoryImpl`.
+- [ ] Hacer el mapeo de DTO a entidad dentro de `data`.
+- [ ] Mover `MoviesDependencyInjector.kt` a `di/`.
+- [ ] Actualizar `MoviesViewModel.kt` para consumir casos de uso y dejar de ordenar o mapear.
+
+### Etapa 3 - Presentation y cierre
+Commit mínimo: 1 commit.
+
+- [ ] Mover `HomeScreen.kt` a `presentation/home/`.
+- [ ] Mover `DetailScreen.kt` a `presentation/detail/`.
+- [ ] Mover `CommonComposables.kt` a `presentation/utils/`.
+- [ ] Mover `App.kt`, `Navigation.kt` y `MoviesViewModel.kt` a la raíz de `presentation/`.
+- [ ] Arreglar todos los imports rotos.
+- [ ] Verificar que `main.kt` quede aislado en la raíz principal.
+
+## Validación por etapa
+
+- Etapa 1: `domain` queda aislado y `data/external` solo contiene DTOs.
+- Etapa 2: `MoviesRepositoryImpl` y `DI` dejan de depender de lógica de negocio en el ViewModel.
+- Etapa 3: `presentation` no importa `data`, home recibe la lista ordenada y clasificada desde `domain` y `DI` concentra las implementaciones concretas.
 
 ## Reglas de diseño
 
@@ -60,12 +74,9 @@ Separar el proyecto en capas claras para que cada una tenga una sola responsabil
 - Domain sin dependencias de UI ni de infraestructura.
 - Evitar duplicar lógica de mapeo o clasificación.
 
-## Validación
+## Validación final
 
-- La app compila.
-- La pantalla home muestra la lista ordenada por voteAverage.
-- La clasificación de QualifiedMovie sale desde domain.
-- La pantalla detail obtiene el detalle desde un caso de uso.
-- Presentation depende solo de domain.
-- Data implementa el contrato de domain.
-- DI queda como único punto de ensamblado.
+- El compilador no tira errores.
+- `presentation` no tiene imports de `data`.
+- La pantalla home recibe la lista ya ordenada y clasificada desde `domain`.
+- `DI` es el único lugar donde conviven implementaciones concretas de todas las capas.
