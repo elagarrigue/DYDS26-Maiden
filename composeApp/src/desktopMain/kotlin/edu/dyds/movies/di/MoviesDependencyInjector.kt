@@ -2,10 +2,15 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import edu.dyds.movies.presentation.MoviesViewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
+import edu.dyds.movies.data.external.RemoteDataSource
+import edu.dyds.movies.data.external.RemoteDataSourceImpl
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
+import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCaseImpl
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
+import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCaseImpl
+import edu.dyds.movies.presentation.detail.DetailViewModel
+import edu.dyds.movies.presentation.home.HomeViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -32,18 +37,31 @@ object MoviesDependencyInjector {
             requestTimeoutMillis = 5000
         }
     }
+    private val dataSource: RemoteDataSource by lazy { RemoteDataSourceImpl(tmdbHttpClient) }
 
-    private val moviesRepository by lazy { MoviesRepositoryImpl(tmdbHttpClient) }
+    private val moviesRepository by lazy { MoviesRepositoryImpl(remoteDataSource = dataSource) }
 
-    private val getPopularMoviesUseCase by lazy { GetPopularMoviesUseCase(moviesRepository) }
+    private val getPopularMoviesUseCase: GetPopularMoviesUseCase by lazy {
+        GetPopularMoviesUseCaseImpl(moviesRepository)
+    }
 
-    private val getMovieDetailsUseCase by lazy { GetMovieDetailsUseCase(moviesRepository) }
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase by lazy {
+        GetMovieDetailsUseCaseImpl(moviesRepository)
+    }
 
     @Composable
-    fun getMoviesViewModel(): MoviesViewModel {
+    fun getHomeViewModel(): HomeViewModel {
         return viewModel {
-            MoviesViewModel(
-                getPopularMoviesUseCase,
+            HomeViewModel(
+                getPopularMoviesUseCase
+            )
+        }
+    }
+
+    @Composable
+    fun getDetailViewModel(): DetailViewModel {
+        return viewModel {
+            DetailViewModel(
                 getMovieDetailsUseCase
             )
         }

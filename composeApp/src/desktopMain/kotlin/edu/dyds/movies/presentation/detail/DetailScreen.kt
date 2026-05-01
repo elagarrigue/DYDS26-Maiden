@@ -3,7 +3,6 @@
 package edu.dyds.movies.presentation.detail
 
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.presentation.MoviesViewModel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -33,9 +32,9 @@ import edu.dyds.movies.presentation.utils.NoResults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(viewModel: MoviesViewModel, id: Int, onBack: () -> Unit) {
+fun DetailScreen(viewModel: DetailViewModel, id: Int, onBack: () -> Unit) {
 
-    val state by viewModel.movieDetailStateFlow.collectAsState(MoviesViewModel.MovieDetailUiState())
+    val state by viewModel.uiState.collectAsState(DetailViewModel.DetailUiState())
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 

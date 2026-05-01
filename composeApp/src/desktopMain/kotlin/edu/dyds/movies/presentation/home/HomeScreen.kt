@@ -4,7 +4,6 @@ package edu.dyds.movies.presentation.home
 
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
-import edu.dyds.movies.presentation.MoviesViewModel
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,7 +32,7 @@ import edu.dyds.movies.presentation.utils.NoResults
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: MoviesViewModel,
+    viewModel: HomeViewModel,
     onGoodMovieClick: (Movie) -> Unit
 ) {
 
@@ -41,7 +40,7 @@ fun HomeScreen(
         viewModel.getAllMovies()
     }
 
-    val state by viewModel.moviesStateFlow.collectAsState(MoviesViewModel.MoviesUiState())
+    val state by viewModel.uiState.collectAsState(HomeViewModel.HomeUiState())
 
     MaterialTheme {
         Surface {
