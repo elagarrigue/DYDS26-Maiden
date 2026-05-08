@@ -14,9 +14,6 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -38,6 +35,14 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             runtimeOnly(libs.slf4j.simple)
+        }
+        val desktopTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.junit)
+            }
         }
     }
 
