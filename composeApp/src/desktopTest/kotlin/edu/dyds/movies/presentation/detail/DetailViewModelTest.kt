@@ -3,63 +3,161 @@ package edu.dyds.movies.presentation.detail
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.testutils.MainDispatcherRule
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Rule
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun `publica estados con movie cuando use case responde`() = runTest(mainDispatcherRule.dispatcher) {
+    fun `emite estado inicial antes de cargar`() = runTest(mainDispatcherRule.dispatcher) {
         val expectedMovie = buildMovie(id = 42)
         val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
         val viewModel = DetailViewModel(useCase)
 
-        val statesDeferred = async { viewModel.uiState.take(3).toList() }
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
 
+        runCurrent()
         viewModel.getMovieDetail(42)
 
         advanceUntilIdle()
-        val states = statesDeferred.await()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
 
-        assertEquals(3, states.size)
         assertEquals(DetailViewModel.DetailUiState(), states[0])
+    }
+
+    @Test
+    fun `emite loading al solicitar detalle`() = runTest(mainDispatcherRule.dispatcher) {
+        val expectedMovie = buildMovie(id = 42)
+        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
+        val viewModel = DetailViewModel(useCase)
+
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
+
+        runCurrent()
+        viewModel.getMovieDetail(42)
+
+        advanceUntilIdle()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
+
         assertTrue(states[1].isLoading)
         assertNull(states[1].movie)
+    }
+
+    @Test
+    fun `emite movie cuando use case responde`() = runTest(mainDispatcherRule.dispatcher) {
+        val expectedMovie = buildMovie(id = 42)
+        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
+        val viewModel = DetailViewModel(useCase)
+
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
+
+        runCurrent()
+        viewModel.getMovieDetail(42)
+
+        advanceUntilIdle()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
+
         assertEquals(expectedMovie, states[2].movie)
         assertEquals(false, states[2].isLoading)
+    }
+
+    @Test
+    fun `invoca use case una vez con id`() = runTest(mainDispatcherRule.dispatcher) {
+        val expectedMovie = buildMovie(id = 42)
+        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
+        val viewModel = DetailViewModel(useCase)
+
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
+
+        runCurrent()
+        viewModel.getMovieDetail(42)
+
+        advanceUntilIdle()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
+
         assertEquals(1, useCase.calls)
         assertEquals(42, useCase.lastRequestedId)
     }
 
     @Test
-    fun `publica estados con movie null cuando use case falla`() = runTest(mainDispatcherRule.dispatcher) {
+    fun `emite movie null cuando use case retorna null`() = runTest(mainDispatcherRule.dispatcher) {
         val useCase = FakeGetMovieDetailsUseCase(result = null)
         val viewModel = DetailViewModel(useCase)
 
-        val statesDeferred = async { viewModel.uiState.take(3).toList() }
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
 
+        runCurrent()
         viewModel.getMovieDetail(7)
 
         advanceUntilIdle()
-        val states = statesDeferred.await()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
 
-        assertEquals(3, states.size)
-        assertEquals(DetailViewModel.DetailUiState(), states[0])
-        assertTrue(states[1].isLoading)
-        assertNull(states[1].movie)
         assertNull(states[2].movie)
         assertEquals(false, states[2].isLoading)
+    }
+
+    @Test
+    fun `invoca use case una vez con id cuando retorna null`() = runTest(mainDispatcherRule.dispatcher) {
+        val useCase = FakeGetMovieDetailsUseCase(result = null)
+        val viewModel = DetailViewModel(useCase)
+
+        val states = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            viewModel.uiState.take(3).toList(states)
+        }
+
+        runCurrent()
+        viewModel.getMovieDetail(7)
+
+        advanceUntilIdle()
+        collectJob.join()
+        viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
+
         assertEquals(1, useCase.calls)
         assertEquals(7, useCase.lastRequestedId)
     }
@@ -88,6 +186,7 @@ class DetailViewModelTest {
         override suspend fun invoke(id: Int): Movie? {
             calls++
             lastRequestedId = id
+            yield()
             return result
         }
     }
