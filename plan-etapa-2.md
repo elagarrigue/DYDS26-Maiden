@@ -16,15 +16,16 @@
 - Type: AFK
 - Blocked by: None - can start immediately
 - User stories covered: N/A
+- Estado: resuelto
 
 ### Issue 1 body
 ## What to build
 Preparar el source set desktopTest con dependencias de test y eliminar el archivo de ejemplo. Dejar el entorno listo para correr unit tests con JUnit4 y coroutines test.
 
 ## Acceptance criteria
-- [ ] desktopTest tiene dependencias de test: kotlin-test, kotlin-test-junit, kotlinx-coroutines-test y junit.
-- [ ] TestExample.kt se elimina o se reemplaza (no queda contenido de ejemplo).
-- [ ] Los tests pueden usar kotlin.test y @Test de JUnit4 sin errores de dependencias.
+- [x] desktopTest tiene dependencias de test: kotlin-test, kotlin-test-junit, kotlinx-coroutines-test y junit.
+- [x] TestExample.kt se elimina o se reemplaza (no queda contenido de ejemplo).
+- [x] Los tests pueden usar kotlin.test y @Test de JUnit4 sin errores de dependencias.
 
 ## Blocked by
 None - can start immediately
@@ -35,15 +36,16 @@ None - can start immediately
 - Type: AFK
 - Blocked by: Issue 1
 - User stories covered: N/A
+- Estado: resuelto
 
 ### Issue 2 body
 ## What to build
 Crear una regla reutilizable para controlar Dispatchers.Main en tests de ViewModel, usando StandardTestDispatcher y coroutines test.
 
 ## Acceptance criteria
-- [ ] MainDispatcherRule existe en el paquete edu.dyds.movies.testutils.
-- [ ] La regla hace set/reset de Dispatchers.Main.
-- [ ] La regla expone un dispatcher reutilizable para runTest.
+- [x] MainDispatcherRule existe en el paquete edu.dyds.movies.testutils.
+- [x] La regla hace set/reset de Dispatchers.Main.
+- [x] La regla expone un dispatcher reutilizable para runTest.
 
 ## Blocked by
 - Issue 1
@@ -51,6 +53,7 @@ Crear una regla reutilizable para controlar Dispatchers.Main en tests de ViewMod
 ---
 
 ## Stage 2 - Slice: Popular movies (lista)
+Estado: saltado por trabajo en paralelo (otro desarrollador).
 
 3) Popular movies - remoto exitoso
 - Type: AFK
