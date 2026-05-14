@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Rule
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,6 +57,7 @@ class HomeViewModelTest {
         val fakeUseCase = object : GetPopularMoviesUseCase {
             override suspend fun invoke(): List<QualifiedMovie> {
                 useCaseCalled++
+                yield()
                 return movies.map { QualifiedMovie(it, it.voteAverage >= 6.0) }
             }
         }
@@ -63,12 +66,13 @@ class HomeViewModelTest {
         // When
         val states = mutableListOf<HomeViewModel.HomeUiState>()
         val collectJob = launch {
-            viewModel.uiState.take(3).collect { states.add(it) } // initial, loading and data
+            viewModel.uiState.take(3).toList(states) // initial, loading and data
         }
 
+        runCurrent()
         viewModel.getAllMovies()
         advanceUntilIdle()
-        collectJob.cancel()
+        collectJob.join()
 
         // Then
         assertEquals(3, states.size)
@@ -86,6 +90,7 @@ class HomeViewModelTest {
         val fakeUseCase = object : GetPopularMoviesUseCase {
             override suspend fun invoke(): List<QualifiedMovie> {
                 useCaseCalled++
+                yield()
                 return emptyList()
             }
         }
@@ -94,12 +99,13 @@ class HomeViewModelTest {
         // When
         val states = mutableListOf<HomeViewModel.HomeUiState>()
         val collectJob = launch {
-            viewModel.uiState.take(3).collect { states.add(it) } // initial, loading and data
+            viewModel.uiState.take(3).toList(states) // initial, loading and data
         }
 
+        runCurrent()
         viewModel.getAllMovies()
         advanceUntilIdle()
-        collectJob.cancel()
+        collectJob.join()
 
         // Then
         assertEquals(3, states.size)
@@ -117,6 +123,7 @@ class HomeViewModelTest {
         val fakeUseCase = object : GetPopularMoviesUseCase {
             override suspend fun invoke(): List<QualifiedMovie> {
                 useCaseCalled++
+                yield()
                 return listOf(
                     QualifiedMovie(
                         Movie(
@@ -140,12 +147,13 @@ class HomeViewModelTest {
 
         // When
         val collectJob = launch {
-            viewModel.uiState.take(3).collect { }
+            viewModel.uiState.take(3).toList()
         }
 
+        runCurrent()
         viewModel.getAllMovies()
         advanceUntilIdle()
-        collectJob.cancel()
+        collectJob.join()
 
         // Then
         assertEquals(1, useCaseCalled)
