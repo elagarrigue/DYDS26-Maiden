@@ -158,4 +158,33 @@ class HomeViewModelTest {
         // Then
         assertEquals(1, useCaseCalled)
     }
+
+    @Test
+    fun `deberia manejar excepcion del use case y emitir lista vacia`() = runTest(mainDispatcherRule.dispatcher) {
+        var calls = 0
+        val throwingUseCase = object : GetPopularMoviesUseCase {
+            override suspend fun invoke(): List<QualifiedMovie> {
+                calls++
+                yield()
+                throw IllegalStateException("boom")
+            }
+        }
+        val vm = HomeViewModel(throwingUseCase)
+
+        val states = mutableListOf<HomeViewModel.HomeUiState>()
+        val collectJob = launch {
+            vm.uiState.take(3).toList(states)
+        }
+
+        runCurrent()
+        vm.getAllMovies()
+        advanceUntilIdle()
+        collectJob.join()
+
+        // En caso de excepcion, el ViewModel debe emitir lista vacia y isLoading false
+        assertEquals(3, states.size)
+        assertFalse(states[2].isLoading)
+        assertTrue(states[2].movies.isEmpty())
+        assertEquals(1, calls)
+    }
 }

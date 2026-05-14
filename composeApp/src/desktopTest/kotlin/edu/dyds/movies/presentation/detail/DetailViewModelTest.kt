@@ -9,7 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlinx.coroutines.cancel
+import org.junit.Before
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -27,13 +27,21 @@ class DetailViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private lateinit var expectedMovie: Movie
+    private lateinit var useCase: FakeGetMovieDetailsUseCase
+    private lateinit var viewModel: DetailViewModel
+    private lateinit var states: MutableList<DetailViewModel.DetailUiState>
+
+    @Before
+    fun setup() {
+        expectedMovie = buildMovie(id = 42)
+        useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
+        viewModel = DetailViewModel(useCase)
+        states = mutableListOf()
+    }
+
     @Test
     fun `emite estado inicial antes de cargar`() = runTest(mainDispatcherRule.dispatcher) {
-        val expectedMovie = buildMovie(id = 42)
-        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
-        val viewModel = DetailViewModel(useCase)
-
-        val states = mutableListOf<DetailViewModel.DetailUiState>()
         val collectJob = launch {
             viewModel.uiState.take(3).toList(states)
         }
@@ -51,11 +59,6 @@ class DetailViewModelTest {
 
     @Test
     fun `emite loading al solicitar detalle`() = runTest(mainDispatcherRule.dispatcher) {
-        val expectedMovie = buildMovie(id = 42)
-        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
-        val viewModel = DetailViewModel(useCase)
-
-        val states = mutableListOf<DetailViewModel.DetailUiState>()
         val collectJob = launch {
             viewModel.uiState.take(3).toList(states)
         }
@@ -74,11 +77,6 @@ class DetailViewModelTest {
 
     @Test
     fun `emite movie cuando use case responde`() = runTest(mainDispatcherRule.dispatcher) {
-        val expectedMovie = buildMovie(id = 42)
-        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
-        val viewModel = DetailViewModel(useCase)
-
-        val states = mutableListOf<DetailViewModel.DetailUiState>()
         val collectJob = launch {
             viewModel.uiState.take(3).toList(states)
         }
@@ -97,11 +95,6 @@ class DetailViewModelTest {
 
     @Test
     fun `invoca use case una vez con id`() = runTest(mainDispatcherRule.dispatcher) {
-        val expectedMovie = buildMovie(id = 42)
-        val useCase = FakeGetMovieDetailsUseCase(result = expectedMovie)
-        val viewModel = DetailViewModel(useCase)
-
-        val states = mutableListOf<DetailViewModel.DetailUiState>()
         val collectJob = launch {
             viewModel.uiState.take(3).toList(states)
         }
@@ -162,6 +155,29 @@ class DetailViewModelTest {
         assertEquals(7, useCase.lastRequestedId)
     }
 
+    @Test
+    fun `emite movie null cuando use case lanza excepcion`() = runTest(mainDispatcherRule.dispatcher) {
+        val throwingUseCase = ThrowingGetMovieDetailsUseCase()
+        val vm = DetailViewModel(throwingUseCase)
+
+        val localStates = mutableListOf<DetailViewModel.DetailUiState>()
+        val collectJob = launch {
+            vm.uiState.take(3).toList(localStates)
+        }
+
+        runCurrent()
+        vm.getMovieDetail(99)
+
+        advanceUntilIdle()
+        collectJob.join()
+        vm.viewModelScope.coroutineContext[Job]?.cancelAndJoin()
+        advanceUntilIdle()
+
+        // En caso de excepcion, el ViewModel debe emitir estado final con movie = null e isLoading = false
+        assertNull(localStates[2].movie)
+        assertEquals(false, localStates[2].isLoading)
+    }
+
     private fun buildMovie(id: Int): Movie {
         return Movie(
             id = id,
@@ -188,6 +204,18 @@ class DetailViewModelTest {
             lastRequestedId = id
             yield()
             return result
+        }
+    }
+
+    private class ThrowingGetMovieDetailsUseCase : GetMovieDetailsUseCase {
+        var calls = 0
+        var lastRequestedId: Int? = null
+
+        override suspend fun invoke(id: Int): Movie? {
+            calls++
+            lastRequestedId = id
+            yield()
+            throw IllegalStateException("boom")
         }
     }
 }
