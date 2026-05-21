@@ -1,6 +1,7 @@
 package edu.dyds.movies.testutils
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -13,6 +14,7 @@ import org.junit.runner.Description
  * Uso: @get:Rule val mainDispatcherRule = MainDispatcherRule()
  * Luego en runTest usar mainDispatcherRule.dispatcher
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     val dispatcher: TestDispatcher = StandardTestDispatcher()
 ) : TestWatcher() {

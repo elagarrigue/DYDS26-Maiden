@@ -1,9 +1,8 @@
 package edu.dyds.movies.data
 
-import edu.dyds.movies.data.external.RemoteDataSource
 import edu.dyds.movies.data.external.RemoteMovie
-import edu.dyds.movies.data.external.RemoteResult
-import edu.dyds.movies.data.local.LocalDataSource
+import edu.dyds.movies.data.fakes.FakeLocalDataSource
+import edu.dyds.movies.data.fakes.FakeRemoteDataSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -103,35 +102,4 @@ class MoviesRepositoryImplDetailTest {
         )
     }
 
-    private class FakeLocalDataSource(initialMovies: List<Movie>) : LocalDataSource {
-        private var cachedMovies: List<Movie> = initialMovies
-
-        override val movies: List<Movie>
-            get() = cachedMovies
-
-        override suspend fun saveMovies(movies: List<Movie>) {
-            cachedMovies = movies
-        }
-    }
-
-    private class FakeRemoteDataSource(
-        private val movieToReturn: RemoteMovie? = null,
-        private val shouldThrow: Boolean = false
-    ) : RemoteDataSource {
-        var getMovieDetailsCalls = 0
-        var lastRequestedId: Int? = null
-
-        override suspend fun getPopularMovies(): RemoteResult {
-            return RemoteResult(page = 1, results = emptyList(), totalPages = 1, totalResults = 0)
-        }
-
-        override suspend fun getMovieDetails(id: Int): RemoteMovie {
-            getMovieDetailsCalls++
-            lastRequestedId = id
-            if (shouldThrow) {
-                throw RuntimeException("Falla remota")
-            }
-            return movieToReturn ?: error("RemoteMovie faltante")
-        }
-    }
 }
