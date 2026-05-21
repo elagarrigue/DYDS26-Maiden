@@ -163,7 +163,6 @@ class HomeViewModelTest {
         vm.getAllMovies()
         collectJob.join()
 
-        // En caso de excepcion, el ViewModel debe emitir lista vacia y isLoading false
         assertEquals(3, states.size)
         assertFalse(states[2].isLoading)
         assertTrue(states[2].movies.isEmpty())

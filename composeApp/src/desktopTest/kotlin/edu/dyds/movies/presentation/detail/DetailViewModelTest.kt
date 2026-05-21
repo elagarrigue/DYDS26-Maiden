@@ -112,7 +112,6 @@ class DetailViewModelTest {
         val localStates = mutableListOf<DetailViewModel.DetailUiState>()
         runGetMovieDetail(vm, 99, localStates)
 
-        // En caso de excepcion, el ViewModel debe emitir estado final con movie = null e isLoading = false
         assertNull(localStates[2].movie)
         assertEquals(false, localStates[2].isLoading)
     }
