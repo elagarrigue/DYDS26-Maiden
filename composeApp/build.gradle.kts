@@ -14,15 +14,13 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(compose.materialIconsExtended)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.coil.compose)
@@ -38,6 +36,14 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
             runtimeOnly(libs.slf4j.simple)
+        }
+        val desktopTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlin.test.junit)
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.junit)
+            }
         }
     }
 
@@ -65,4 +71,3 @@ tasks.withType<JavaExec>().configureEach {
         mainClass.set("edu.dyds.movies.MainKt")
     }
 }
-
