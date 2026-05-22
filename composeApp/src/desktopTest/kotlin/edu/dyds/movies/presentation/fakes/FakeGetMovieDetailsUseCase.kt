@@ -5,7 +5,8 @@ import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import kotlinx.coroutines.yield
 
 class FakeGetMovieDetailsUseCase(
-    private val result: Movie?
+    private val result: Movie? = null,
+    private val exceptionToThrow: Exception? = null,
 ) : GetMovieDetailsUseCase {
     var calls = 0
     var lastRequestedId: Int? = null
@@ -14,6 +15,7 @@ class FakeGetMovieDetailsUseCase(
         calls++
         lastRequestedId = id
         yield()
+        exceptionToThrow?.let { throw it }
         return result
     }
 }

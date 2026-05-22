@@ -2,7 +2,6 @@ package edu.dyds.movies.presentation.detail
 
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.presentation.fakes.FakeGetMovieDetailsUseCase
-import edu.dyds.movies.presentation.fakes.ThrowingGetMovieDetailsUseCase
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -106,8 +105,10 @@ class DetailViewModelTest {
 
     @Test
     fun `emite movie null cuando use case lanza excepcion`() = runTest(dispatcher) {
-        val throwingUseCase = ThrowingGetMovieDetailsUseCase()
-        val vm = DetailViewModel(throwingUseCase)
+        val useCase = FakeGetMovieDetailsUseCase(
+            exceptionToThrow = IllegalStateException("boom")
+        )
+        val vm = DetailViewModel(useCase)
 
         val localStates = mutableListOf<DetailViewModel.DetailUiState>()
         runGetMovieDetail(vm, 99, localStates)
