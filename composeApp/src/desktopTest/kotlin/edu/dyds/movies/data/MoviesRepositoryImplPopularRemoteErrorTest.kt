@@ -3,6 +3,7 @@ package edu.dyds.movies.data
 import edu.dyds.movies.data.external.RemoteDataSource
 import edu.dyds.movies.data.external.RemoteMovie
 import edu.dyds.movies.data.external.RemoteResult
+import edu.dyds.movies.data.external.RemoteMoviesExternalSourceAdapter
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
@@ -22,7 +23,12 @@ class MoviesRepositoryImplPopularRemoteErrorTest {
             override val movies: List<Movie> get() = emptyList()
             override suspend fun saveMovies(movies: List<Movie>) {}
         }
-        val repository = MoviesRepositoryImpl(fakeRemoteDataSource, fakeLocalDataSource)
+        val externalSource = RemoteMoviesExternalSourceAdapter(fakeRemoteDataSource)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = externalSource,
+            movieExternalSource = externalSource,
+            localDataSource = fakeLocalDataSource
+        )
 
         // When
         val result = repository.getPopularMovies()

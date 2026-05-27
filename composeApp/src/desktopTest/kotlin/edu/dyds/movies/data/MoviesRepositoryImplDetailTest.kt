@@ -1,6 +1,7 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.external.RemoteMovie
+import edu.dyds.movies.data.external.RemoteMoviesExternalSourceAdapter
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
 import edu.dyds.movies.data.fakes.FakeRemoteDataSource
 import edu.dyds.movies.domain.entity.Movie
@@ -16,7 +17,12 @@ class MoviesRepositoryImplDetailTest {
         val cachedMovie = buildMovie(id = 7)
         val local = FakeLocalDataSource(listOf(cachedMovie))
         val remote = FakeRemoteDataSource()
-        val repository = MoviesRepositoryImpl(remote, local)
+        val externalSource = RemoteMoviesExternalSourceAdapter(remote)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = externalSource,
+            movieExternalSource = externalSource,
+            localDataSource = local
+        )
 
         val result = repository.getMovieDetails(cachedMovie.id)
 
@@ -33,7 +39,12 @@ class MoviesRepositoryImplDetailTest {
         )
         val local = FakeLocalDataSource(emptyList())
         val remote = FakeRemoteDataSource(movieToReturn = remoteMovie)
-        val repository = MoviesRepositoryImpl(remote, local)
+        val externalSource = RemoteMoviesExternalSourceAdapter(remote)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = externalSource,
+            movieExternalSource = externalSource,
+            localDataSource = local
+        )
 
         val result = repository.getMovieDetails(12)
 
@@ -59,7 +70,12 @@ class MoviesRepositoryImplDetailTest {
     fun `cuando remoto falla retorna null`() = runTest {
         val local = FakeLocalDataSource(emptyList())
         val remote = FakeRemoteDataSource(shouldThrow = true)
-        val repository = MoviesRepositoryImpl(remote, local)
+        val externalSource = RemoteMoviesExternalSourceAdapter(remote)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = externalSource,
+            movieExternalSource = externalSource,
+            localDataSource = local
+        )
 
         val result = repository.getMovieDetails(5)
 

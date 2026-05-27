@@ -3,8 +3,11 @@ package edu.dyds.movies.di
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
+import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MoviesExternalSource
 import edu.dyds.movies.data.external.RemoteDataSource
 import edu.dyds.movies.data.external.RemoteDataSourceImpl
+import edu.dyds.movies.data.external.RemoteMoviesExternalSourceAdapter
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.data.local.LocalDataSourceImpl
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
@@ -39,11 +42,20 @@ object MoviesDependencyInjector {
             requestTimeoutMillis = 5000
         }
     }
-    private val dataSource: RemoteDataSource by lazy { RemoteDataSourceImpl(tmdbHttpClient) }
+    private val remoteDataSource: RemoteDataSource by lazy { RemoteDataSourceImpl(tmdbHttpClient) }
+    private val externalSourceAdapter by lazy { RemoteMoviesExternalSourceAdapter(remoteDataSource) }
+    private val moviesExternalSource: MoviesExternalSource by lazy { externalSourceAdapter }
+    private val movieExternalSource: MovieExternalSource by lazy { externalSourceAdapter }
 
     private val localDataSource: LocalDataSource by lazy { LocalDataSourceImpl() }
 
-    private val moviesRepository by lazy { MoviesRepositoryImpl(remoteDataSource = dataSource, localDataSource = localDataSource) }
+    private val moviesRepository by lazy {
+        MoviesRepositoryImpl(
+            moviesExternalSource = moviesExternalSource,
+            movieExternalSource = movieExternalSource,
+            localDataSource = localDataSource
+        )
+    }
 
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase by lazy {
         GetPopularMoviesUseCaseImpl(moviesRepository)
