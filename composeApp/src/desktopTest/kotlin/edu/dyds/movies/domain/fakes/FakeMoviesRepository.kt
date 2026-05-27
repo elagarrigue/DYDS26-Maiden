@@ -7,13 +7,13 @@ class FakeMoviesRepository(
     private val movieToReturn: Movie?
 ) : MoviesRepository {
     var calls = 0
-    var lastRequestedId: Int? = null
+    var lastRequestedTitle: String? = null
 
     override suspend fun getPopularMovies(): List<Movie> = emptyList()
 
-    override suspend fun getMovieDetails(id: Int): Movie? {
+    override suspend fun getMovieDetails(title: String): Movie? {
         calls++
-        lastRequestedId = id
+        lastRequestedTitle = title
         return movieToReturn
     }
 }

@@ -27,14 +27,21 @@ class MoviesRepositoryImpl(
         }
     }
 
-    override suspend fun getMovieDetails(id: Int): Movie? {
-        val cachedMovie = localDataSource.movies.find { it.id == id }
+    override suspend fun getMovieDetails(title: String): Movie? {
+        if (title.isBlank()) return null
+
+        val normalizedTitle = normalizeTitle(title)
+        val cachedMovie = localDataSource.getMovieDetail(normalizedTitle)
         if (cachedMovie != null) {
             return cachedMovie
         }
 
         return try {
-            movieExternalSource.getMovieByTitle(id.toString())
+            val movie = movieExternalSource.getMovieByTitle(title)
+            if (movie != null) {
+                localDataSource.saveMovieDetail(normalizedTitle, movie)
+            }
+            movie
         } catch (e: Exception) {
             null
         }
