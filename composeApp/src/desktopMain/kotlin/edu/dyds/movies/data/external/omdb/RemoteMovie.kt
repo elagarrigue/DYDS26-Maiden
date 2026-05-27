@@ -13,12 +13,11 @@ data class RemoteMovie(
     @SerialName("Poster") val poster: String? = null,
     @SerialName("Language") val language: String? = null,
     @SerialName("Metascore") val metaScore: String? = null,
-    val imdbRating: String? = null,
+    val imdbRating: Double = 0.0,
     @SerialName("Response") val response: String,
     @SerialName("Error") val error: String? = null
 ) {
     fun toDomainMovie(): Movie {
-        val parsedPopularity = imdbRating?.toDoubleOrNull() ?: 0.0
         val parsedVoteAverage = if (metaScore != null && metaScore != "N/A" && metaScore.isNotBlank()) {
             metaScore.toDoubleOrNull() ?: 0.0
         } else {
@@ -40,7 +39,7 @@ data class RemoteMovie(
             backdrop = if (poster != "N/A" && poster != null) poster else null,
             originalTitle = title ?: "",
             originalLanguage = if (language != "N/A" && language != null) language else "",
-            popularity = parsedPopularity,
+            popularity = imdbRating,
             voteAverage = parsedVoteAverage
         )
     }
