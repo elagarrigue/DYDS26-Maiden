@@ -1,8 +1,8 @@
 package edu.dyds.movies.data
 
-import edu.dyds.movies.data.external.RemoteMovie
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
-import edu.dyds.movies.data.fakes.FakeRemoteDataSource
+import edu.dyds.movies.data.fakes.FakeMovieExternalSource
+import edu.dyds.movies.data.fakes.FakeMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,93 +13,73 @@ class MoviesRepositoryImplDetailTest {
 
     @Test
     fun `cuando hay cache retorna pelicula y no llama remoto`() = runTest {
-        val cachedMovie = buildMovie(id = 7)
-        val local = FakeLocalDataSource(listOf(cachedMovie))
-        val remote = FakeRemoteDataSource()
-        val repository = MoviesRepositoryImpl(remote, local)
+        val cachedMovie = buildMovie(title = "Inception")
+        val local = FakeLocalDataSource(emptyList())
+        local.saveMovieDetail("inception", cachedMovie)
+        
+        val moviesSource = FakeMoviesExternalSource()
+        val movieSource = FakeMovieExternalSource()
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = moviesSource,
+            movieExternalSource = movieSource,
+            localDataSource = local
+        )
 
-        val result = repository.getMovieDetails(cachedMovie.id)
+        val result = repository.getMovieDetails("Inception")
 
         assertEquals(cachedMovie, result)
-        assertEquals(0, remote.getMovieDetailsCalls)
+        assertEquals(0, movieSource.calls)
     }
 
     @Test
-    fun `cuando no hay cache llama remoto y mapea pelicula`() = runTest {
-        val remoteMovie = buildRemoteMovie(
-            id = 12,
-            posterPath = "/poster.jpg",
-            backdropPath = "/backdrop.jpg"
-        )
+    fun `cuando no hay cache llama remoto y guarda en cache`() = runTest {
+        val remoteMovie = buildMovie(title = "Avatar")
         val local = FakeLocalDataSource(emptyList())
-        val remote = FakeRemoteDataSource(movieToReturn = remoteMovie)
-        val repository = MoviesRepositoryImpl(remote, local)
-
-        val result = repository.getMovieDetails(12)
-
-        val expected = Movie(
-            id = remoteMovie.id,
-            title = remoteMovie.title,
-            overview = remoteMovie.overview,
-            releaseDate = remoteMovie.releaseDate,
-            poster = "https://image.tmdb.org/t/p/w185${remoteMovie.posterPath}",
-            backdrop = remoteMovie.backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" },
-            originalTitle = remoteMovie.originalTitle,
-            originalLanguage = remoteMovie.originalLanguage,
-            popularity = remoteMovie.popularity,
-            voteAverage = remoteMovie.voteAverage
+        val moviesSource = FakeMoviesExternalSource()
+        val movieSource = FakeMovieExternalSource(movieToReturn = remoteMovie)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = moviesSource,
+            movieExternalSource = movieSource,
+            localDataSource = local
         )
 
-        assertEquals(1, remote.getMovieDetailsCalls)
-        assertEquals(12, remote.lastRequestedId)
-        assertEquals(expected, result)
+        val result = repository.getMovieDetails("Avatar")
+
+        assertEquals(1, movieSource.calls)
+        assertEquals("Avatar", movieSource.lastRequestedTitle)
+        assertEquals(remoteMovie, result)
+        assertEquals(remoteMovie, local.getMovieDetail("avatar"))
     }
 
     @Test
     fun `cuando remoto falla retorna null`() = runTest {
         val local = FakeLocalDataSource(emptyList())
-        val remote = FakeRemoteDataSource(shouldThrow = true)
-        val repository = MoviesRepositoryImpl(remote, local)
+        val moviesSource = FakeMoviesExternalSource()
+        val movieSource = FakeMovieExternalSource(shouldThrow = true)
+        val repository = MoviesRepositoryImpl(
+            moviesExternalSource = moviesSource,
+            movieExternalSource = movieSource,
+            localDataSource = local
+        )
 
-        val result = repository.getMovieDetails(5)
+        val result = repository.getMovieDetails("Unknown")
 
-        assertEquals(1, remote.getMovieDetailsCalls)
-        assertEquals(5, remote.lastRequestedId)
+        assertEquals(1, movieSource.calls)
         assertNull(result)
     }
 
-    private fun buildMovie(id: Int): Movie {
+    private fun buildMovie(title: String): Movie {
         return Movie(
-            id = id,
-            title = "Pelicula $id",
-            overview = "Overview $id",
+            id = title.hashCode(),
+            title = title,
+            overview = "Overview $title",
             releaseDate = "2024-01-01",
             poster = "https://image.tmdb.org/t/p/w185/poster.jpg",
             backdrop = "https://image.tmdb.org/t/p/w780/backdrop.jpg",
-            originalTitle = "Original $id",
+            originalTitle = "Original $title",
             originalLanguage = "en",
             popularity = 7.5,
             voteAverage = 6.7
         )
     }
-
-    private fun buildRemoteMovie(
-        id: Int,
-        posterPath: String = "/poster.jpg",
-        backdropPath: String? = "/backdrop.jpg"
-    ): RemoteMovie {
-        return RemoteMovie(
-            id = id,
-            title = "Pelicula $id",
-            overview = "Overview $id",
-            releaseDate = "2024-01-01",
-            posterPath = posterPath,
-            backdropPath = backdropPath,
-            originalTitle = "Original $id",
-            originalLanguage = "en",
-            popularity = 7.5,
-            voteAverage = 6.7
-        )
-    }
-
 }

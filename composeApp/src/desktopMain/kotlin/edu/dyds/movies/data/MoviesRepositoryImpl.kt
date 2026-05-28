@@ -1,12 +1,14 @@
 package edu.dyds.movies.data
 
-import edu.dyds.movies.data.external.RemoteDataSource
+import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MoviesExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
 
 class MoviesRepositoryImpl(
-    private val remoteDataSource: RemoteDataSource,
+    private val moviesExternalSource: MoviesExternalSource,
+    private val movieExternalSource: MovieExternalSource,
     private val localDataSource: LocalDataSource
 ) : MoviesRepository {
 
@@ -17,8 +19,7 @@ class MoviesRepositoryImpl(
         }
 
         return try {
-            val result = remoteDataSource.getPopularMovies()   
-            val movies = result.results.map { it.toDomainMovie() }
+            val movies = moviesExternalSource.getPopularMovies()
             localDataSource.saveMovies(movies)
             movies
         } catch (e: Exception) {
@@ -26,15 +27,21 @@ class MoviesRepositoryImpl(
         }
     }
 
-    override suspend fun getMovieDetails(id: Int): Movie? {
-        val cachedMovie = localDataSource.movies.find { it.id == id }
+    override suspend fun getMovieDetails(title: String): Movie? {
+        if (title.isBlank()) return null
+
+        val normalizedTitle = normalizeTitle(title)
+        val cachedMovie = localDataSource.getMovieDetail(normalizedTitle)
         if (cachedMovie != null) {
             return cachedMovie
         }
 
         return try {
-            val movie = remoteDataSource.getMovieDetails(id)
-            movie.toDomainMovie()
+            val movie = movieExternalSource.getMovieByTitle(title)
+            if (movie != null) {
+                localDataSource.saveMovieDetail(normalizedTitle, movie)
+            }
+            movie
         } catch (e: Exception) {
             null
         }
