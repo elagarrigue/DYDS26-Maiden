@@ -1,13 +1,13 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.external.MovieExternalSource
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
 
 class MoviesRepositoryImpl(
-    private val moviesExternalSource: MoviesExternalSource,
+    private val popularMoviesExternalSource: PopularMoviesExternalSource,
     private val movieExternalSource: MovieExternalSource,
     private val localDataSource: LocalDataSource
 ) : MoviesRepository {
@@ -19,7 +19,7 @@ class MoviesRepositoryImpl(
         }
 
         return try {
-            val movies = moviesExternalSource.getPopularMovies()
+            val movies = popularMoviesExternalSource.getPopularMovies()
             localDataSource.saveMovies(movies)
             movies
         } catch (e: Exception) {

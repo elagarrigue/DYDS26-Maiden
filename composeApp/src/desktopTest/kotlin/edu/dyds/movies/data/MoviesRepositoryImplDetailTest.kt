@@ -2,7 +2,7 @@ package edu.dyds.movies.data
 
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
 import edu.dyds.movies.data.fakes.FakeMovieExternalSource
-import edu.dyds.movies.data.fakes.FakeMoviesExternalSource
+import edu.dyds.movies.data.fakes.FakePopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,10 +17,10 @@ class MoviesRepositoryImplDetailTest {
         val local = FakeLocalDataSource(emptyList())
         local.saveMovieDetail("Inception", cachedMovie)
         
-        val moviesSource = FakeMoviesExternalSource()
+        val moviesSource = FakePopularMoviesExternalSource()
         val movieSource = FakeMovieExternalSource()
         val repository = MoviesRepositoryImpl(
-            moviesExternalSource = moviesSource,
+            popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,
             localDataSource = local
         )
@@ -35,10 +35,10 @@ class MoviesRepositoryImplDetailTest {
     fun `cuando no hay cache llama remoto y guarda en cache`() = runTest {
         val remoteMovie = buildMovie(title = "Avatar")
         val local = FakeLocalDataSource(emptyList())
-        val moviesSource = FakeMoviesExternalSource()
+        val moviesSource = FakePopularMoviesExternalSource()
         val movieSource = FakeMovieExternalSource(movieToReturn = remoteMovie)
         val repository = MoviesRepositoryImpl(
-            moviesExternalSource = moviesSource,
+            popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,
             localDataSource = local
         )
@@ -54,10 +54,10 @@ class MoviesRepositoryImplDetailTest {
     @Test
     fun `cuando remoto falla retorna null`() = runTest {
         val local = FakeLocalDataSource(emptyList())
-        val moviesSource = FakeMoviesExternalSource()
+        val moviesSource = FakePopularMoviesExternalSource()
         val movieSource = FakeMovieExternalSource(shouldThrow = true)
         val repository = MoviesRepositoryImpl(
-            moviesExternalSource = moviesSource,
+            popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,
             localDataSource = local
         )
