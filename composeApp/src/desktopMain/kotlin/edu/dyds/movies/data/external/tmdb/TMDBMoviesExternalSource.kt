@@ -2,8 +2,8 @@ package edu.dyds.movies.data.external.tmdb
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
-import edu.dyds.movies.data.normalizeTitle
 import edu.dyds.movies.domain.entity.Movie
+import edu.dyds.movies.domain.normalizeTitle
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

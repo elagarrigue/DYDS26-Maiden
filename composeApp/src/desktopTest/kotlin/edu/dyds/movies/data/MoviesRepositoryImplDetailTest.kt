@@ -15,7 +15,7 @@ class MoviesRepositoryImplDetailTest {
     fun `cuando hay cache retorna pelicula y no llama remoto`() = runTest {
         val cachedMovie = buildMovie(title = "Inception")
         val local = FakeLocalDataSource(emptyList())
-        local.saveMovieDetail("inception", cachedMovie)
+        local.saveMovieDetail("Inception", cachedMovie)
         
         val moviesSource = FakeMoviesExternalSource()
         val movieSource = FakeMovieExternalSource()
@@ -48,7 +48,7 @@ class MoviesRepositoryImplDetailTest {
         assertEquals(1, movieSource.calls)
         assertEquals("Avatar", movieSource.lastRequestedTitle)
         assertEquals(remoteMovie, result)
-        assertEquals(remoteMovie, local.getMovieDetail("avatar"))
+        assertEquals(remoteMovie, local.getMovieDetail("Avatar"))
     }
 
     @Test

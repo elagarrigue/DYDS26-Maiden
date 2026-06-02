@@ -30,8 +30,7 @@ class MoviesRepositoryImpl(
     override suspend fun getMovieDetails(title: String): Movie? {
         if (title.isBlank()) return null
 
-        val normalizedTitle = normalizeTitle(title)
-        val cachedMovie = localDataSource.getMovieDetail(normalizedTitle)
+        val cachedMovie = localDataSource.getMovieDetail(title)
         if (cachedMovie != null) {
             return cachedMovie
         }
@@ -39,7 +38,7 @@ class MoviesRepositoryImpl(
         return try {
             val movie = movieExternalSource.getMovieByTitle(title)
             if (movie != null) {
-                localDataSource.saveMovieDetail(normalizedTitle, movie)
+                localDataSource.saveMovieDetail(title, movie)
             }
             movie
         } catch (e: Exception) {

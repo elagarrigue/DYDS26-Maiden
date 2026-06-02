@@ -14,11 +14,11 @@ class FakeLocalDataSource(initialMovies: List<Movie>) : LocalDataSource {
         cachedMovies = movies
     }
 
-    override fun getMovieDetail(normalizedTitle: String): Movie? {
-        return cachedDetails[normalizedTitle]
+    override fun getMovieDetail(title: String): Movie? {
+        return cachedDetails[title]
     }
 
-    override suspend fun saveMovieDetail(normalizedTitle: String, movie: Movie) {
-        cachedDetails[normalizedTitle] = movie
+    override suspend fun saveMovieDetail(title: String, movie: Movie) {
+        cachedDetails[title] = movie
     }
 }

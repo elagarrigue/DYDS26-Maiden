@@ -15,11 +15,11 @@ class GetMovieDetailsUseCaseImplTest {
         val repository = FakeMoviesRepository(movieToReturn = expectedMovie)
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
-        val result = useCase("Pelicula 9")
+        val result = useCase("  Pelicula   9  ")
 
         assertEquals(expectedMovie, result)
         assertEquals(1, repository.calls)
-        assertEquals("Pelicula 9", repository.lastRequestedTitle)
+        assertEquals("pelicula 9", repository.lastRequestedTitle)
     }
 
     @Test
@@ -27,11 +27,11 @@ class GetMovieDetailsUseCaseImplTest {
         val repository = FakeMoviesRepository(movieToReturn = null)
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
-        val result = useCase("Pelicula 4")
+        val result = useCase("  Pelicula   4  ")
 
         assertNull(result)
         assertEquals(1, repository.calls)
-        assertEquals("Pelicula 4", repository.lastRequestedTitle)
+        assertEquals("pelicula 4", repository.lastRequestedTitle)
     }
 
     private fun buildMovie(id: Int): Movie {

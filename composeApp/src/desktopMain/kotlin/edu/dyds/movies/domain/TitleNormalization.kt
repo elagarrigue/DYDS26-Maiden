@@ -1,4 +1,4 @@
-package edu.dyds.movies.data
+package edu.dyds.movies.domain
 
 import java.util.Locale
 
