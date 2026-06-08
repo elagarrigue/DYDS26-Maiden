@@ -1,14 +1,14 @@
 package edu.dyds.movies.data.external.broker
 
-import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 
-internal class MovieExternalSourceBroker(
-    private val tmdbSource: MovieExternalSource,
-    private val omdbSource: MovieExternalSource
-) : MovieExternalSource {
+internal class MovieDetailExternalSourceBroker(
+    private val tmdbSource: MovieDetailExternalSource,
+    private val omdbSource: MovieDetailExternalSource
+) : MovieDetailExternalSource {
 
     override suspend fun getMovieByTitle(title: String): Movie? = supervisorScope {
         val tmdbDeferred = async {

@@ -3,11 +3,11 @@ package edu.dyds.movies.di
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
-import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
 import edu.dyds.movies.data.external.PopularMoviesExternalSource
-import edu.dyds.movies.data.external.broker.MovieExternalSourceBroker
-import edu.dyds.movies.data.external.omdb.OMDBMoviesExternalSource
-import edu.dyds.movies.data.external.tmdb.TMDBPopularMoviesExternalSource
+import edu.dyds.movies.data.external.broker.MovieDetailExternalSourceBroker
+import edu.dyds.movies.data.external.omdb.OMDBMoviesDetailExternalSource
+import edu.dyds.movies.data.external.tmdb.TMDBPopularMoviesDetailExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.data.local.LocalDataSourceImpl
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
@@ -60,20 +60,20 @@ object MoviesDependencyInjector {
         }
     }
 
-    private val tmdbExternalSource: TMDBPopularMoviesExternalSource by lazy {
-        TMDBPopularMoviesExternalSource(tmdbHttpClient)
+    private val tmdbExternalSource: TMDBPopularMoviesDetailExternalSource by lazy {
+        TMDBPopularMoviesDetailExternalSource(tmdbHttpClient)
     }
 
-    private val omdbExternalSource: MovieExternalSource by lazy {
-        OMDBMoviesExternalSource(omdbHttpClient)
+    private val omdbExternalSource: MovieDetailExternalSource by lazy {
+        OMDBMoviesDetailExternalSource(omdbHttpClient)
     }
 
-    private val movieExternalSourceBroker: MovieExternalSource by lazy {
-        MovieExternalSourceBroker(tmdbExternalSource, omdbExternalSource)
+    private val movieExternalSourceBroker: MovieDetailExternalSource by lazy {
+        MovieDetailExternalSourceBroker(tmdbExternalSource, omdbExternalSource)
     }
 
     private val popularMoviesExternalSource: PopularMoviesExternalSource by lazy { tmdbExternalSource }
-    private val movieExternalSource: MovieExternalSource by lazy { movieExternalSourceBroker }
+    private val movieExternalSource: MovieDetailExternalSource by lazy { movieExternalSourceBroker }
 
     private val localDataSource: LocalDataSource by lazy { LocalDataSourceImpl() }
 

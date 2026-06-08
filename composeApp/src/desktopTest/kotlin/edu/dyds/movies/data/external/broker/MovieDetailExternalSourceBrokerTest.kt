@@ -16,7 +16,7 @@ class MovieExternalSourceBrokerTest {
         
         val tmdbSource = FakeMovieExternalSource(movieToReturn = tmdbMovie)
         val omdbSource = FakeMovieExternalSource(movieToReturn = omdbMovie)
-        val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
+        val broker = MovieDetailExternalSourceBroker(tmdbSource, omdbSource)
 
         val result = broker.getMovieByTitle("Inception")
 
@@ -33,7 +33,7 @@ class MovieExternalSourceBrokerTest {
         val tmdbMovie = buildMovie(title = "Inception", overview = "TMDB Plot")
         val tmdbSource = FakeMovieExternalSource(movieToReturn = tmdbMovie)
         val omdbSource = FakeMovieExternalSource(movieToReturn = null)
-        val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
+        val broker = MovieDetailExternalSourceBroker(tmdbSource, omdbSource)
 
         val result = broker.getMovieByTitle("Inception")
 
@@ -46,7 +46,7 @@ class MovieExternalSourceBrokerTest {
         val omdbMovie = buildMovie(title = "Inception", overview = "OMDB Plot")
         val tmdbSource = FakeMovieExternalSource(movieToReturn = null)
         val omdbSource = FakeMovieExternalSource(movieToReturn = omdbMovie)
-        val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
+        val broker = MovieDetailExternalSourceBroker(tmdbSource, omdbSource)
 
         val result = broker.getMovieByTitle("Inception")
 
@@ -58,7 +58,7 @@ class MovieExternalSourceBrokerTest {
     fun `cuando ninguno responde retorna null`() = runTest {
         val tmdbSource = FakeMovieExternalSource(movieToReturn = null)
         val omdbSource = FakeMovieExternalSource(movieToReturn = null)
-        val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
+        val broker = MovieDetailExternalSourceBroker(tmdbSource, omdbSource)
 
         val result = broker.getMovieByTitle("Inception")
 
@@ -70,7 +70,7 @@ class MovieExternalSourceBrokerTest {
         val tmdbMovie = buildMovie(title = "Inception", overview = "TMDB Plot")
         val tmdbSource = FakeMovieExternalSource(movieToReturn = tmdbMovie)
         val omdbSource = FakeMovieExternalSource(shouldThrow = true)
-        val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
+        val broker = MovieDetailExternalSourceBroker(tmdbSource, omdbSource)
 
         val result = broker.getMovieByTitle("Inception")
 

@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.external.omdb
 
-import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -8,9 +8,9 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 
-internal class OMDBMoviesExternalSource(
+internal class OMDBMoviesDetailExternalSource(
     private val client: HttpClient
-) : MovieExternalSource {
+) : MovieDetailExternalSource {
 
     override suspend fun getMovieByTitle(title: String): Movie? {
         val response = try {
