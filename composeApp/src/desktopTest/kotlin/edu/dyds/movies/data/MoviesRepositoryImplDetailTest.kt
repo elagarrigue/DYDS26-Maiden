@@ -1,7 +1,7 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
-import edu.dyds.movies.data.fakes.FakeMovieExternalSource
+import edu.dyds.movies.data.fakes.FakeMovieDetailExternalSource
 import edu.dyds.movies.data.fakes.FakePopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
@@ -18,7 +18,7 @@ class MoviesRepositoryImplDetailTest {
         local.saveMovieDetail("Inception", cachedMovie)
         
         val moviesSource = FakePopularMoviesExternalSource()
-        val movieSource = FakeMovieExternalSource()
+        val movieSource = FakeMovieDetailExternalSource()
         val repository = MoviesRepositoryImpl(
             popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,
@@ -36,7 +36,7 @@ class MoviesRepositoryImplDetailTest {
         val remoteMovie = buildMovie(title = "Avatar")
         val local = FakeLocalDataSource(emptyList())
         val moviesSource = FakePopularMoviesExternalSource()
-        val movieSource = FakeMovieExternalSource(movieToReturn = remoteMovie)
+        val movieSource = FakeMovieDetailExternalSource(movieToReturn = remoteMovie)
         val repository = MoviesRepositoryImpl(
             popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,
@@ -55,7 +55,7 @@ class MoviesRepositoryImplDetailTest {
     fun `cuando remoto falla retorna null`() = runTest {
         val local = FakeLocalDataSource(emptyList())
         val moviesSource = FakePopularMoviesExternalSource()
-        val movieSource = FakeMovieExternalSource(shouldThrow = true)
+        val movieSource = FakeMovieDetailExternalSource(shouldThrow = true)
         val repository = MoviesRepositoryImpl(
             popularMoviesExternalSource = moviesSource,
             movieExternalSource = movieSource,

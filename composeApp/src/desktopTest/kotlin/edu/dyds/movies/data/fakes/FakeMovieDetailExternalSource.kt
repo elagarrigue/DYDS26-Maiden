@@ -3,7 +3,7 @@ package edu.dyds.movies.data.fakes
 import edu.dyds.movies.data.external.MovieDetailExternalSource
 import edu.dyds.movies.domain.entity.Movie
 
-class FakeMovieExternalSource(
+class FakeMovieDetailExternalSource(
     private val movieToReturn: Movie? = null,
     private val shouldThrow: Boolean = false
 ) : MovieDetailExternalSource {

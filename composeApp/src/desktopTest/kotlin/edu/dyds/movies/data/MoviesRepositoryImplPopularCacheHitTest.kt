@@ -1,7 +1,7 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
-import edu.dyds.movies.data.fakes.FakeMovieExternalSource
+import edu.dyds.movies.data.fakes.FakeMovieDetailExternalSource
 import edu.dyds.movies.data.fakes.FakePopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
@@ -29,7 +29,7 @@ class MoviesRepositoryImplPopularCacheHitTest {
         )
         
         val moviesSource = FakePopularMoviesExternalSource()
-        val movieSource = FakeMovieExternalSource()
+        val movieSource = FakeMovieDetailExternalSource()
         val local = FakeLocalDataSource(cachedMovies)
         val repository = MoviesRepositoryImpl(
             popularMoviesExternalSource = moviesSource,

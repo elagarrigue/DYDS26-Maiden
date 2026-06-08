@@ -1,7 +1,7 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.fakes.FakeLocalDataSource
-import edu.dyds.movies.data.fakes.FakeMovieExternalSource
+import edu.dyds.movies.data.fakes.FakeMovieDetailExternalSource
 import edu.dyds.movies.data.fakes.FakePopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlin.test.Test
@@ -41,7 +41,7 @@ class MoviesRepositoryImplPopularRemoteSuccessTest {
         )
         
         val moviesSource = FakePopularMoviesExternalSource(moviesToReturn = domainMovies)
-        val movieSource = FakeMovieExternalSource()
+        val movieSource = FakeMovieDetailExternalSource()
         val local = FakeLocalDataSource(emptyList())
         val repository = MoviesRepositoryImpl(
             popularMoviesExternalSource = moviesSource,
