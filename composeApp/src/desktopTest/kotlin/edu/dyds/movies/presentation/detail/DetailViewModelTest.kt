@@ -50,14 +50,14 @@ class DetailViewModelTest {
 
     @Test
     fun `emite estado inicial antes de cargar`() = runTest(dispatcher) {
-        runGetMovieDetail(viewModel, 42, states)
+        runGetMovieDetail(viewModel, "Inception", states)
 
         assertEquals(DetailViewModel.DetailUiState(), states[0])
     }
 
     @Test
     fun `emite loading al solicitar detalle`() = runTest(dispatcher) {
-        runGetMovieDetail(viewModel, 42, states)
+        runGetMovieDetail(viewModel, "Inception", states)
 
         assertTrue(states[1].isLoading)
         assertNull(states[1].movie)
@@ -65,7 +65,7 @@ class DetailViewModelTest {
 
     @Test
     fun `emite movie cuando use case responde`() = runTest(dispatcher) {
-        runGetMovieDetail(viewModel, 42, states)
+        runGetMovieDetail(viewModel, "Inception", states)
 
         assertEquals(expectedMovie, states[2].movie)
         assertEquals(false, states[2].isLoading)
@@ -73,10 +73,10 @@ class DetailViewModelTest {
 
     @Test
     fun `invoca use case una vez con id`() = runTest(dispatcher) {
-        runGetMovieDetail(viewModel, 42, states)
+        runGetMovieDetail(viewModel, "Inception", states)
 
         assertEquals(1, useCase.calls)
-        assertEquals(42, useCase.lastRequestedId)
+        assertEquals("Inception", useCase.lastRequestedTitle)
     }
 
     @Test
@@ -85,7 +85,7 @@ class DetailViewModelTest {
         val viewModel = DetailViewModel(useCase)
 
         val states = mutableListOf<DetailViewModel.DetailUiState>()
-        runGetMovieDetail(viewModel, 7, states)
+        runGetMovieDetail(viewModel, "Unknown", states)
 
         assertNull(states[2].movie)
         assertEquals(false, states[2].isLoading)
@@ -97,10 +97,10 @@ class DetailViewModelTest {
         val viewModel = DetailViewModel(useCase)
 
         val states = mutableListOf<DetailViewModel.DetailUiState>()
-        runGetMovieDetail(viewModel, 7, states)
+        runGetMovieDetail(viewModel, "Unknown", states)
 
         assertEquals(1, useCase.calls)
-        assertEquals(7, useCase.lastRequestedId)
+        assertEquals("Unknown", useCase.lastRequestedTitle)
     }
 
     @Test
@@ -111,7 +111,7 @@ class DetailViewModelTest {
         val vm = DetailViewModel(useCase)
 
         val localStates = mutableListOf<DetailViewModel.DetailUiState>()
-        runGetMovieDetail(vm, 99, localStates)
+        runGetMovieDetail(vm, "Boom", localStates)
 
         assertNull(localStates[2].movie)
         assertEquals(false, localStates[2].isLoading)
@@ -119,14 +119,14 @@ class DetailViewModelTest {
 
     private suspend fun TestScope.runGetMovieDetail(
         viewModel: DetailViewModel,
-        id: Int,
+        title: String,
         states: MutableList<DetailViewModel.DetailUiState>,
     ) {
         val collectJob = launch {
             viewModel.uiState.take(3).toList(states)
         }
 
-        viewModel.getMovieDetail(id)
+        viewModel.getMovieDetail(title)
 
         collectJob.join()
         viewModel.viewModelScope.coroutineContext[Job]?.cancelAndJoin()

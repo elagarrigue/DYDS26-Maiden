@@ -15,11 +15,15 @@ import edu.dyds.movies.di.MoviesDependencyInjector.getHomeViewModel
 import edu.dyds.movies.presentation.detail.DetailScreen
 import edu.dyds.movies.presentation.home.HomeScreen
 
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 private const val HOME = "home"
 
 private const val DETAIL = "detail"
 
-private const val MOVIE_ID = "movieId"
+private const val MOVIE_TITLE = "movieTitle"
 
 @Composable
 fun Navigation() {
@@ -36,7 +40,8 @@ private fun NavGraphBuilder.homeDestination(navController: NavHostController) {
         HomeScreen(
             viewModel = getHomeViewModel(),
             onGoodMovieClick = {
-                navController.navigate("$DETAIL/${it.id}")
+                val encodedTitle = URLEncoder.encode(it.title, StandardCharsets.UTF_8.toString())
+                navController.navigate("$DETAIL/$encodedTitle")
             }
         )
     }
@@ -44,13 +49,12 @@ private fun NavGraphBuilder.homeDestination(navController: NavHostController) {
 
 private fun NavGraphBuilder.detailDestination(navController: NavHostController) {
     composable(
-        route = "$DETAIL/{$MOVIE_ID}",
-        arguments = listOf(navArgument(MOVIE_ID) { type = NavType.IntType })
+        route = "$DETAIL/{$MOVIE_TITLE}",
+        arguments = listOf(navArgument(MOVIE_TITLE) { type = NavType.StringType })
     ) { backstackEntry ->
-        val movieId = backstackEntry.arguments?.getInt(MOVIE_ID)
+        val encodedTitle = backstackEntry.arguments?.getString(MOVIE_TITLE) ?: ""
+        val decodedTitle = URLDecoder.decode(encodedTitle, StandardCharsets.UTF_8.toString())
 
-        movieId?.let {
-            DetailScreen(getDetailViewModel(), it, onBack = { navController.popBackStack() })
-        }
+        DetailScreen(getDetailViewModel(), decodedTitle, onBack = { navController.popBackStack() })
     }
 }

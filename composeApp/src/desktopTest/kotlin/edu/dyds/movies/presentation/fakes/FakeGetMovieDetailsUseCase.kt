@@ -9,11 +9,11 @@ class FakeGetMovieDetailsUseCase(
     private val exceptionToThrow: Exception? = null,
 ) : GetMovieDetailsUseCase {
     var calls = 0
-    var lastRequestedId: Int? = null
+    var lastRequestedTitle: String? = null
 
-    override suspend fun invoke(id: Int): Movie? {
+    override suspend fun invoke(title: String): Movie? {
         calls++
-        lastRequestedId = id
+        lastRequestedTitle = title
         yield()
         exceptionToThrow?.let { throw it }
         return result

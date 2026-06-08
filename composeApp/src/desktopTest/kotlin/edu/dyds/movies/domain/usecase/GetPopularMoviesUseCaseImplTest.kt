@@ -52,7 +52,7 @@ class GetPopularMoviesUseCaseImplTest {
         )
         val fakeRepository = object : MoviesRepository {
             override suspend fun getPopularMovies(): List<Movie> = movies
-            override suspend fun getMovieDetails(id: Int): Movie? = null
+            override suspend fun getMovieDetails(title: String): Movie? = null
         }
         val useCase = GetPopularMoviesUseCaseImpl(fakeRepository)
 
@@ -109,7 +109,7 @@ class GetPopularMoviesUseCaseImplTest {
         )
         val fakeRepository = object : MoviesRepository {
             override suspend fun getPopularMovies(): List<Movie> = movies
-            override suspend fun getMovieDetails(id: Int): Movie? = null
+            override suspend fun getMovieDetails(title: String): Movie? = null
         }
         val useCase = GetPopularMoviesUseCaseImpl(fakeRepository)
 
@@ -153,7 +153,7 @@ class GetPopularMoviesUseCaseImplTest {
         )
         val fakeRepository = object : MoviesRepository {
             override suspend fun getPopularMovies(): List<Movie> = movies
-            override suspend fun getMovieDetails(id: Int): Movie? = null
+            override suspend fun getMovieDetails(title: String): Movie? = null
         }
         val useCase = GetPopularMoviesUseCaseImpl(fakeRepository)
 
@@ -170,7 +170,7 @@ class GetPopularMoviesUseCaseImplTest {
         // Given
         val fakeRepository = object : MoviesRepository {
             override suspend fun getPopularMovies(): List<Movie> = emptyList()
-            override suspend fun getMovieDetails(id: Int): Movie? = null
+            override suspend fun getMovieDetails(title: String): Movie? = null
         }
         val useCase = GetPopularMoviesUseCaseImpl(fakeRepository)
 
